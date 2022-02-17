@@ -1,92 +1,81 @@
-elements.r_conveyor = {
-	name: "Right Conveyor",
-    color: "#2a2a36",
-	colorOn: "#3b3b4a",
-	state: "solid",
-    category: "machines",
-	conduct: 1,
-	tick: function(pixel) {
-		doHeat(pixel)
-		doBurning(pixel)
-		doElectricity(pixel)
-		
-		let pixelAbove = pixelMap[pixel.x][pixel.y-1]
-		
-		if (!isEmpty(pixel.x, pixel.y-1) && pixel.charge > 0.5 && elements[pixelAbove.element].movable == true ) {
-			tryMove(pixelAbove,pixel.x+1,pixel.y-1)
-		}
-	}
-};
-elements.l_conveyor = {
-	name: "Left Conveyor",
-    color: "#2a2a36",
-	colorOn: "#3b3b4a",
-	state: "solid",
-    category: "machines",
-	conduct: 1,
-	tick: function(pixel) {
-		doHeat(pixel)
-		doBurning(pixel)
-		doElectricity(pixel)
-		
-		let pixelAbove = pixelMap[pixel.x][pixel.y-1]
-		
-		if (!isEmpty(pixel.x, pixel.y-1) && pixel.charge > 0.5 && elements[pixelAbove.element].movable == true ) {
-			tryMove(pixelAbove,pixel.x-1,pixel.y-1)
-		}
-	}
-};
-elements.r_autoconveyor = {
-	name: "Right Autoconveyor",
-    color: "#3b3b4a",
-	state: "solid",
-    category: "machines",
-	tick: function(pixel) {
-		doHeat(pixel)
-		doBurning(pixel)
-		doElectricity(pixel)
-		
-		let pixelAbove = pixelMap[pixel.x][pixel.y-1]
-		
-		if (!isEmpty(pixel.x, pixel.y-1) && elements[pixelAbove.element].movable == true ) {
-			tryMove(pixelAbove,pixel.x+1,pixel.y-1)
-		}
-	}
-};
-elements.l_autoconveyor = {
-	name: "Left Autoconveyor",
-    color: "#3b3b4a",
-	state: "solid",
-    category: "machines",
-	tick: function(pixel) {
-		doHeat(pixel)
-		doBurning(pixel)
-		doElectricity(pixel)
-		
-		let pixelAbove = pixelMap[pixel.x][pixel.y-1]
-		
-		if (!isEmpty(pixel.x, pixel.y-1) && elements[pixelAbove.element].movable == true ) {
-			tryMove(pixelAbove,pixel.x-1,pixel.y-1)
-		}
-	}
+// This is how to add a new mod to the game.
+
+// Create a new Javascript file like this one.
+// Add the file to the mods folder on GitHub, or host it somewhere else.
+// https://github.com/slweeb/sandboxels/tree/main/mods
+
+// To add it in the Mod Loader:
+// If it is in the mods folder, you can just use the name of the file.
+// If it is hosted somewhere else, you can use the full URL, including the HTTPS://.
+
+// Adding elements:
+elements.mayo = {
+    color: "#ffffff",
+    behavior: behaviors.LIQUID,
+    category: "liquids",
+    viscosity: 100000,
+    state: "liquid",
+    density: 720,
 };
 
+// Changing existing elements:
+elements.water.color = "#ff0000";
+elements.water.behavior = behaviors.WALL;
+
+// Removing elements:
+// Be aware, things may break
+delete elements.ketchup;
+
+// Adding behavior presets:
+behaviors.SELFDELETE = [
+    "XX|XX|XX",
+    "XX|DL|XX",
+    "XX|XX|XX",
+];
+
+// Raw JavaScript behaviors:
+behaviors.mud.tick = function(pixel) {
+    if (tryMove(pixel, pixel.x, pixel.y+1)) {
+        console.log("Moved!");
+    }
+    else {
+        console.log("Couldn't move!")
+    }
+};
+
+// Create a new tool:
+elements.sand_exploder = {
+    color: "#ff0000",
+    tool: function(pixel) {
+        if (pixel.element == "sand") {
+            pixel.element = "explosion"
+        }
+    },
+    category: "tools",
+};
+
+// Add reactions to existing elements
+if (!elements.water.reactions) { // Include this block once
+    elements.water.reactions = {} // This creates the property if it doesn't exist
+}
+elements.water.reactions.mayo = { "elem1":null, "elem2":"mayo_water" }
+elements.water.reactions.soap = { "elem1":null, "elem2":"soapy_water" }
+
+// Run after all mods are loaded, for cross-mod compatibility
 runAfterLoad(function() {
-	for (element in elements) {
-		let behavior = elements[element].behavior
-		let movable = false
-		for (line in behavior) { // check if element has a M1 or M2 in their behavior
-			line = behavior[line]
-			if (line.includes("M1") || line.includes("M2")) {
-				movable = true
-			}
-			else {
-			}
-		}
-		
-		if (movable != false) { // if element has M1 or M2, set movable to true, makes them movable by conveyors
-			elements[element].movable = true
-		}
-		
-	}
+    // Your code here
+    console.log("Hello World!");
 });
+
+// Run if another mod is active
+if (enabledMods.includes("test.js")) {
+    runAfterLoad(function() {
+        // Your code here
+        console.log("Hello World!");
+    });
+}
+
+// Creating eLists:
+eLists.CONDIMENT = ["ketchup","melted_cheese","mayo"];
+// Adding elements to eLists:
+eLists.CONDIMENT.push("honey");
